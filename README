@@ -7,3 +7,13 @@ It is an implementation of URL-based classifier in JavaScript.
 See http://wiki.duboue.net/index.php/URL_Classifier
 
 Work in progress, not nicely packaged yet.
+
+To use it, download content.rdf.u8.gz from dmoz.org and extract a training file as follows:
+
+  zcat content.rdf.u8.gz | perl -ne 'if(m/<ExternalPage/){($u)=m/about=\"(.*)\"\>/}elsif(m/\<topic/){($t)=m/\<topic\>Top\/(.*)\<\/topic\>/}elsif(m/\<\/ExternalPage/){print "$t\t$u\n" if($t and $u);$t="";$u=""}'|sort|uniq | gzip - > full_cat_urls.tsv.gz
+  zcat full_cat_urls.tsv.gz | perl -ne '@a=split(/\t/,$_);@b=split(/\//,@a[0]);push@b,'Top'; print $b[0]."\t".$b[1]."\t".$a[1]' > two_cats_urls.tsv
+
+then train the classifier with
+
+  node train/stay_classy.js
+
