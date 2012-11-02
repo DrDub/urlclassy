@@ -25,26 +25,40 @@ var NGRAM_SIZE=3;
 
 // initialize the classifier
 var classifier = new apparatus.BayesClassifier();
-var features = {};
+var features = { 'LENGTH' : 0 };
 
-function instanceToObservation(instance){
+function instanceToSparseObservation(instance){
     var these_features = {};
     for(var i=0; i<instance.url.length-NGRAM_SIZE; i++){
 	var feat = instance.url.substr(i, i+NGRAM_SIZE);
-	these_features[feat] = 1;
-	features[feat] = 1;
-    }
-
-    var observation = new Array();
-    for(var feat in features){
-	if(feat in these_features){
-	    observation.push(1);
+	if(feat in features){
+	    these_features[features[feat]] = 1;
 	}else{
-	    observation.push(0);
+	    features[feat] = features.LENGTH;
+	    these_features[features.LENGTH] = 1;
+	    features.LENGTH++;
 	}
     }
+
+    return these_features;
+}
+
+function instanceToObservation(instance){
+    var observation = new Array();
+    for(var i=0; i<features.LENGTH; i++){
+	observation.push(0);
+    }
+
+    for(var i=0; i<instance.url.length-NGRAM_SIZE; i++){
+        var feat = instance.url.substr(i, i+NGRAM_SIZE);
+	if(feat in features){
+	    observation[features[feat]] = 1;
+	}
+    }
+
     return observation;
 }
+
 
 var test = [];
 var train_size = 0;
@@ -61,7 +75,7 @@ new lazy(fs.createReadStream('../dmoz/two_cats_urls.tsv'))
 	    test.push(instance);
         }else{
 	    // update the classifier
-	    classifier.addExample(instanceToObservation(instance), instance.classy);
+	    classifier.addSparseExample(instanceToSparseObservation(instance), instance.classy);
 	    train_size++;
 	}
     })
