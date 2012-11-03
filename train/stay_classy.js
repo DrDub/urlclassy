@@ -30,7 +30,7 @@ var features = { 'LENGTH' : 0 };
 function instanceToSparseObservation(instance){
     var these_features = {};
     for(var i=0; i<instance.url.length-NGRAM_SIZE; i++){
-	var feat = instance.url.substr(i, i+NGRAM_SIZE);
+	var feat = instance.url.substr(i, NGRAM_SIZE);
 	if(feat in features){
 	    these_features[features[feat]] = 1;
 	}else{
@@ -50,7 +50,7 @@ function instanceToObservation(instance){
     }
 
     for(var i=0; i<instance.url.length-NGRAM_SIZE; i++){
-        var feat = instance.url.substr(i, i+NGRAM_SIZE);
+        var feat = instance.url.substr(i, NGRAM_SIZE);
 	if(feat in features){
 	    observation[features[feat]] = 1;
 	}
@@ -68,15 +68,21 @@ new lazy(fs.createReadStream('../dmoz/two_cats_urls.tsv'))
     .lines
     .forEach(function(line){
 	var parts = line.toString().split("\t");
-        var classy = parts[0]+"-"+parts[1];
+        var classy = parts[0]; //+"-"+parts[1];
         var instance = { 'classy': classy,
                          'url' : parts[2] };
         if(Math.random() < 0.1){
 	    test.push(instance);
         }else{
 	    // update the classifier
-	    classifier.addSparseExample(instanceToSparseObservation(instance), instance.classy);
-	    train_size++;
+	    if(Math.random() < 0.1){
+		classifier.addSparseExample(instanceToSparseObservation(instance), 
+					    instance.classy);
+		train_size++;
+		if(train_size % 100000 == 0){
+		    console.log(train_size);
+		}
+	    }
 	}
     })
     .join(function(nothing){
@@ -84,17 +90,21 @@ new lazy(fs.createReadStream('../dmoz/two_cats_urls.tsv'))
 	classifier.train();
 	console.log('Writing...');
 	// save classifier
-	fs.writeFile('classifier.json', JSON.stringify(classifier), 'utf8', 
+
+	fs.writeFileSync('classifier.json', JSON.stringify(classifier), 'utf8', 
 		     function(err){ if(err){ console.log(err) } });
-	fs.writeFile('features.json', JSON.stringify(features), 'utf8', 
+	fs.writeFileSync('features.json', JSON.stringify(features), 'utf8', 
 		     function(err){ if(err){ console.log(err) } });
+
 	// test
 	console.log('Evaluating...');
 	var correct = 0;
 	for(var i=0; i<test.length; i++){
 	    var classy = classifier.classify(instanceToObservation(test[i]));
-	    if(Math.random() < 0.1) {
+	    if(Math.random() < 0.01) {
                 console.log("For URL: "+test[i].url+" target: "+test[i].classy+" predicted: "+classy);
+		//var classes = classifier.getClassifications(instanceToObservation(test[i]));
+		//console.log("Classes: "+JSON.stringify(classes));
             }
 	    if(classy === test[i].classy){
 		correct++;
