@@ -27,3 +27,5 @@ The current demo (in example/) is trained in top level class and
 10%. Unseen performance is 54% accurary but that includes lots of
 repeated URLs. Actual performance seems to be at 30% at most.
 
+See the demo at http://drdub.github.com/urlclassy/example/
+
