@@ -25,10 +25,10 @@ var classifier = BayesClassifier.restore(trained_classifier);
 var NGRAM_SIZE=4;
 var features = trained_features;
 
-function instanceToSparseObservation(instance){
+function instanceToSparseObservation(url){
     var these_features = {};
-    for(var i=0; i<instance.url.length-NGRAM_SIZE; i++){
-	var feat = instance.url.substr(i, NGRAM_SIZE);
+    for(var i=0; i<url.length-NGRAM_SIZE; i++){
+	var feat = url.substr(i, NGRAM_SIZE);
 	if(feat in features){
 	    these_features[features[feat]] = 1;
 	}else{
