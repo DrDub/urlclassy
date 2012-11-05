@@ -22,25 +22,25 @@
 
 var classifier = BayesClassifier.restore(trained_classifier);
 
-var NGRAM_SIZE=3;
+var NGRAM_SIZE=4;
 var features = trained_features;
 
-function instanceToObservation(url){
-    var observation = new Array();
-    for(var i=0; i<features.LENGTH; i++){
-	observation.push(0);
-    }
-
-    for(var i=0; i<url.length-NGRAM_SIZE; i++){
-        var feat = url.substr(i, NGRAM_SIZE);
+function instanceToSparseObservation(instance){
+    var these_features = {};
+    for(var i=0; i<instance.url.length-NGRAM_SIZE; i++){
+	var feat = instance.url.substr(i, NGRAM_SIZE);
 	if(feat in features){
-	    observation[features[feat]] = 1;
+	    these_features[features[feat]] = 1;
+	}else{
+	    features[feat] = features.LENGTH;
+	    these_features[features.LENGTH] = 1;
+	    features.LENGTH++;
 	}
     }
 
-    return observation;
+    return these_features;
 }
 
 function be_classy(url) {
-    return classifier.getClassifications(instanceToObservation(url));
+    return classifier.getSparseClassifications(instanceToSparseObservation(url));
 }

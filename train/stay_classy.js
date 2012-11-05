@@ -75,7 +75,7 @@ new lazy(fs.createReadStream('../dmoz/two_cats_urls.tsv'))
 	    test.push(instance);
         }else{
 	    // update the classifier
-	    if(true) { 
+	    if(Math.random() < 0.1){
 		classifier.addSparseExample(instanceToSparseObservation(instance), 
 					    instance.classy);
 		train_size++;
