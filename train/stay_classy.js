@@ -21,7 +21,7 @@ var lazy = require("../lib/lazy"),
 fs   = require("fs"),
 apparatus = require("../lib/apparatus/index.js");
 
-var NGRAM_SIZE=3;
+var NGRAM_SIZE=4;
 
 // initialize the classifier
 var classifier = new apparatus.BayesClassifier();
@@ -75,7 +75,7 @@ new lazy(fs.createReadStream('../dmoz/two_cats_urls.tsv'))
 	    test.push(instance);
         }else{
 	    // update the classifier
-	    if(Math.random() < 0.2){
+	    if(true) { 
 		classifier.addSparseExample(instanceToSparseObservation(instance), 
 					    instance.classy);
 		train_size++;
