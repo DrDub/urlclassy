@@ -102,6 +102,23 @@ function probabilityOfClass(observation, label) {
     return prob;
 }
 
+function sparseProbabilityOfClass(observation, label) {
+    var prob = 0;
+
+    for(var key in observation){
+	// default to 1 for smoothing
+        var count = this.classFeatures[label][key] || 0.0001; 
+
+	// numbers are tiny, add logs rather than take product
+        prob += Math.log(count / this.classTotals[label]);
+    }
+
+    // p(C) * unlogging the above calculation P(X|C)
+    prob = (this.classTotals[label] / this.totalExamples) * Math.exp(prob);
+    
+    return prob;
+}
+
 function getClassifications(observation) {
     var classifier = this;
     var labels = [];
@@ -109,6 +126,19 @@ function getClassifications(observation) {
     for(var className in this.classFeatures) {
 	labels.push({label: className,
 	      value: classifier.probabilityOfClass(observation, className)});
+    }
+    
+    labels.sort(function(x, y) {return y.value - x.value});
+    return labels;
+}
+
+function getSparseClassifications(observation) {
+    var classifier = this;
+    var labels = [];
+    
+    for(var className in this.classFeatures) {
+	labels.push({label: className,
+	      value: classifier.sparseProbabilityOfClass(observation, className)});
     }
     
     labels.sort(function(x, y) {return y.value - x.value});
@@ -126,6 +156,8 @@ BayesClassifier.prototype.addExample = addExample;
 BayesClassifier.prototype.addSparseExample = addSparseExample;
 BayesClassifier.prototype.train = train;
 BayesClassifier.prototype.getClassifications = getClassifications;
+BayesClassifier.prototype.getSparseClassifications = getSparseClassifications;
 BayesClassifier.prototype.probabilityOfClass = probabilityOfClass;
+BayesClassifier.prototype.sparseProbabilityOfClass = sparseProbabilityOfClass;
 
 BayesClassifier.restore = restore;
