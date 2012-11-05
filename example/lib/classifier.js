@@ -37,6 +37,10 @@ function classify(observation) {
     return this.getClassifications(observation)[0].label;
 }
 
+function sparseClassify(observation) {
+    return this.getSparseClassifications(observation)[0].label;
+}
+
 function train() {
     throw 'Not implemented';
 }
@@ -44,6 +48,7 @@ function train() {
 Classifier.prototype.addExample = addExample;
 Classifier.prototype.train = train;
 Classifier.prototype.classify = classify;
+Classifier.prototype.sparseClassify = sparseClassify;
 
 Classifier.restore = restore;
 
