@@ -75,7 +75,7 @@ new lazy(fs.createReadStream('../dmoz/two_cats_urls.tsv'))
 	    test.push(instance);
         }else{
 	    // update the classifier
-	    if(Math.random() < 0.1){
+	    if(Math.random() < 1){
 		classifier.addSparseExample(instanceToSparseObservation(instance), 
 					    instance.classy);
 		train_size++;
@@ -86,6 +86,8 @@ new lazy(fs.createReadStream('../dmoz/two_cats_urls.tsv'))
 	}
     })
     .join(function(nothing){
+	console.log('Prunning...');
+	classifier.pruneFeatures();
 	console.log('Training on '+train_size+'...');
 	classifier.train();
 	console.log('Writing...');
@@ -102,7 +104,7 @@ new lazy(fs.createReadStream('../dmoz/two_cats_urls.tsv'))
 	for(var i=0; i<test.length; i++){
 	    var classy = classifier.sparseClassify(instanceToSparseObservation(test[i]));
 	    if(Math.random() < 0.01) {
-                console.log("For URL: "+test[i].url+" target: "+test[i].classy+" predicted: "+classy);
+                //console.log("For URL: "+test[i].url+" target: "+test[i].classy+" predicted: "+classy);
 		//var classes = classifier.getSparseClassifications(instanceToSparseObservation(test[i]));
 		//console.log("Classes: "+JSON.stringify(classes));
             }
