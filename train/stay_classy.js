@@ -21,7 +21,8 @@ var lazy = require("../lib/lazy"),
 fs   = require("fs"),
 apparatus = require("../lib/apparatus/index.js");
 
-var NGRAM_SIZE=4;
+var NGRAM_SIZE_MIN=3;
+var NGRAM_SIZE_MAX=9;
 
 // initialize the classifier
 var classifier = new apparatus.BayesClassifier();
@@ -29,15 +30,16 @@ var features = { 'LENGTH' : 0 };
 
 function instanceToSparseObservation(instance){
     var these_features = {};
-    for(var i=0; i<instance.url.length-NGRAM_SIZE; i++){
-	var feat = instance.url.substr(i, NGRAM_SIZE);
-	if(feat in features){
-	    these_features[features[feat]] = 1;
-	}else{
-	    features[feat] = features.LENGTH;
-	    these_features[features.LENGTH] = 1;
-	    features.LENGTH++;
-	}
+    for(var ngram=NGRAM_SIZE_MIN; ngram<NGRAM_SIZE_MAX; ngram++)
+	for(var i=0; i<instance.url.length-ngram; i++){
+	    var feat = instance.url.substr(i, ngram);
+	    if(feat in features){
+		these_features[features[feat]] = 1;
+	    }else{
+		features[feat] = features.LENGTH;
+		these_features[features.LENGTH] = 1;
+		features.LENGTH++;
+	    }
     }
 
     return these_features;
@@ -49,12 +51,13 @@ function instanceToObservation(instance){
 	observation.push(0);
     }
 
-    for(var i=0; i<instance.url.length-NGRAM_SIZE; i++){
-        var feat = instance.url.substr(i, NGRAM_SIZE);
-	if(feat in features){
-	    observation[features[feat]] = 1;
+    for(var ngram=NGRAM_SIZE_MIN; ngram<NGRAM_SIZE_MAX; ngram++)
+	for(var i=0; i<instance.url.length-ngram; i++){
+            var feat = instance.url.substr(i, ngram);
+	    if(feat in features){
+		observation[features[feat]] = 1;
+	    }
 	}
-    }
 
     return observation;
 }
@@ -75,7 +78,7 @@ new lazy(fs.createReadStream('../dmoz/two_cats_urls.tsv'))
 	    test.push(instance);
         }else{
 	    // update the classifier
-	    if(Math.random() < 1){
+	    if(Math.random() < 0.1){
 		classifier.addSparseExample(instanceToSparseObservation(instance), 
 					    instance.classy);
 		train_size++;
