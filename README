@@ -1,5 +1,5 @@
-URL Classy: URL Classy: Guessing a class for a URL only from its text  
-=====================================================================
+URL Classy: Guessing a class for a URL only from its text  
+=========================================================
 
 URL Classy is a library that assigns a top-level dmoz category based
 on the URL text.  It is an implementation of URL-based classifier in
