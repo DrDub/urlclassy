@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012, Pablo Ariel Duboue
+  Copyright (C) 2012-2014, Pablo Ariel Duboue
 
   This file is part of URL Classy.
 
@@ -67,18 +67,18 @@ var test = [];
 var train_size = 0;
 
 // for each line in the training file
-new lazy(fs.createReadStream('../dmoz/two_cats_urls.tsv'))
+new lazy(fs.createReadStream(process.argv[2]))
     .lines
     .forEach(function(line){
 	var parts = line.toString().split("\t");
         var classy = parts[0]; //+"-"+parts[1];
         var instance = { 'classy': classy,
                          'url' : parts[2] };
-        if(Math.random() < 0.1){
+        if(Math.random() < 0.001){
 	    test.push(instance);
         }else{
 	    // update the classifier
-	    if(Math.random() < 0.1){
+	    if(Math.random() < 0.001){
 		classifier.addSparseExample(instanceToSparseObservation(instance), 
 					    instance.classy);
 		train_size++;
@@ -89,8 +89,8 @@ new lazy(fs.createReadStream('../dmoz/two_cats_urls.tsv'))
 	}
     })
     .join(function(nothing){
-	console.log('Prunning...');
-	classifier.pruneFeatures();
+	//console.log('Prunning...');
+	//classifier.pruneFeatures();
 	console.log('Training on '+train_size+'...');
 	classifier.train();
 	console.log('Writing...');
