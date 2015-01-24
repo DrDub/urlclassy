@@ -1,6 +1,6 @@
 #URL Classy
 
-Guessing a class for a URL only from its text.
+Guessing a class for a URL only from its text. See a [live demo](http://drdub.github.io/urlclassy/example).
 
 ## Description
 
